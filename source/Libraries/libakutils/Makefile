@@ -1,34 +1,36 @@
+TARGET         := libakutils.so
 include ../../CommonMakefile.mk
+BUILD_DIR      := .build_$(ARCH)
+SRC_DIR        := src
+INCLUDES := \
+	-Iinclude \
+	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
 
-TARGET ?= native
-SRC_DIR := src
-INCLUDE_DIR := include
-BUILD_DIR := .build
-OUT_DIR := output
+OBJ_DIR        := $(BUILD_DIR)/src
+OBJS           := $(OBJ_DIR)/akJsonUtils.o
+CXX            := g++
+CXXFLAGS       += -Wall -Werror -fPIC $(INCLUDES)
+LDFLAGS        += -shared
 
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
+# Color codes
+YELLOW := \033[1;33m
+NC := \033[0m
 
-BIN := $(BUILD_DIR)/libakutils.so
+.PHONY: all clean
 
-CXXFLAGS += -I$(INCLUDE_DIR)
+all: $(BUILD_DIR)/$(TARGET)
+	@echo "$(YELLOW)[STAGE]$(NC) Built $(TARGET)"
 
-$(BUILD_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR)/$(TARGET): $(OBJS)
+	@echo "$(YELLOW)[STAGE]$(NC) Building Shared Library: $(TARGET)"
+	@$(CXX) $(LDFLAGS) -o $@ $^
 
-all: $(BIN)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	@echo "$(YELLOW)[Compiling]$(NC) $<"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BIN): $(OBJS)
-	$(CXX) $^ -o $@
-	$(STRIP) $@
-
-install:
-	@mkdir -p $(INSTALL_PATH)/usr/lib
-	cp $(BIN) $(INSTALL_PATH)/usr/lib
+$(OBJ_DIR):
+	@mkdir -p $@
 
 clean:
-	rm -rf $(BUILD_DIR) $(OUT_DIR)
-
--include $(DEPS)
+	@rm -rf $(BUILD_DIR)

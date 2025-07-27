@@ -1,0 +1,16 @@
+#!/bin/sh
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+echo "[Hook] Checking commit message for Jira ticket..."
+
+# Require 'SCRUM-' followed by 1 or more digits
+if ! echo "$COMMIT_MSG" | grep -qE '^SCRUM-[0-9]+'; then
+  echo "❌ Commit message must start with a Jira ticket like: SCRUM-123"
+  exit 1
+fi
+
+echo "✅ Jira ticket found: $(echo "$COMMIT_MSG" | grep -oE 'SCRUM-[0-9]+')"
+exit 0
+
