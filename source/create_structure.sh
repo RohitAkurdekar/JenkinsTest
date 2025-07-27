@@ -2,37 +2,33 @@
 
 # Check if a parameter is provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 <applications|libraries|thirdparty|microservices|ALL>"
+    printf"Usage: $0 <applications|libraries|thirdparty|microservices|ALL> \n"
     exit 1
 fi
 
 # Add content to CommonMakefile.mk
 generate_common_makefile() {
     cat > CommonMakefile.mk <<EOL
-# CommonMakefile
-BUILD_MODE ?= release
-ARCH ?= x86_64
-BUILD_DIR = .build_\$(ARCH)
+### Root: source/CommonMakefile.mk ###
+ARCH ?= native
+# Common build settings
+CXX := g++
+CXXFLAGS := -std=c++17 -Wall -Wextra -fPIC
+LDFLAGS :=
 
-ifeq (\$(BUILD_MODE), debug)
-    CFLAGS += -g -O0
-else
-    CFLAGS += -O2 -s
-endif
+# Root Directory (one level above source)
+ROOT_DIR := $(abspath $(CURDIR)/../..)
+LIBRARIES_DIR := $(ROOT_DIR)/Libraries
+THIRD_PARTY_DIR := $(ROOT_DIR)/ThirdPartyLibs
 
-INSTALL_PATH ?= \$(DEST)
+# Output directories
+BUILD_DIR := $(CURDIR)/.build_$(ARCH)
+SRC_DIR := $(CURDIR)/src
+INC_DIR := $(CURDIR)/include
 
-all: build
-
-build:
-	@echo "Building in \$(BUILD_DIR) with mode: \$(BUILD_MODE)"
-	@mkdir -p \$(BUILD_DIR)
-
-install:
-	@echo "Installing to \$(INSTALL_PATH)"
-	@if [ -z "\$(INSTALL_PATH)" ]; then echo "DEST is not set"; exit 1; fi
-	@mkdir -p \$(INSTALL_PATH)/usr/bin
-	@mkdir -p \$(INSTALL_PATH)/usr/lib
+# Tools
+MKDIR_P := mkdir -p
+RM := rm -rf
 EOL
 }
 
@@ -153,10 +149,10 @@ build_directories() {
     local base_dir=\$1
     if [ -d "\$base_dir" ]; then
         for dir in \$(find "\$base_dir" -mindepth 1 -maxdepth 1 -type d); do
-            echo "Building \$dir..."
+            printf"Building \$dir..."
             make -C "\$dir" target=\$TARGET BUILD_TYPE=\$BUILD_TYPE
             if [ \$? -ne 0 ]; then
-                echo "Build failed for \$dir. Exiting."
+                printf"Build failed for \$dir. Exiting."
                 exit 1
             fi
         done
@@ -164,22 +160,22 @@ build_directories() {
 }
 
 # Build Applications
-echo "Building Applications..."
+printf"Building Applications..."
 build_directories "Applications"
 
 # Build Libraries
-echo "Building Libraries..."
+printf"Building Libraries..."
 build_directories "Libraries"
 
 # Build Microservices Plugins
-echo "Building Microservices Plugins..."
+printf"Building Microservices Plugins..."
 build_directories "Microservices/plugins"
 
 # Build Microservices Extension Modules
-echo "Building Microservices Extension Modules..."
+printf"Building Microservices Extension Modules..."
 build_directories "Microservices/extModule"
 
-echo "Build completed successfully."
+printf"Build completed successfully."
 EOL
     chmod +x Build.sh
 }
@@ -198,14 +194,14 @@ case "$1" in
         create_microservices
         ;;
     ALL)
-        echo "Creating all directory types..."
+        printf"Creating all directory types..."
         create_applications
         create_libraries
         create_thirdparty
         create_microservices
         ;;
     *)
-        echo "Invalid option. Use 'applications', 'libraries', 'thirdparty', 'microservices', or 'ALL'."
+        printf"Invalid option. Use 'applications', 'libraries', 'thirdparty', 'microservices', or 'ALL'."
         exit 1
         ;;
 esac

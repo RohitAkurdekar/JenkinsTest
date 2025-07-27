@@ -1,0 +1,26 @@
+#!/bin/sh
+
+echo "Pre-Commit task Running..."
+echo "\033[34m=> [Hook] Running clang-format on staged files...\033[0m "
+
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|h|c|hpp)$')
+
+for file in $FILES; do
+    echo "\033[1;33mProcessing file: $file\033[0m "
+    case "$file" in
+        *ThirdPartyLibs*)
+            echo "Skipping ThirdPartyLibs: $file"
+            continue
+            ;;
+    esac
+    clang-format -i "$file"
+    git add "$file"
+done
+
+echo "\033[34m=> [Hook] Running update_version.sh...\033[0m "
+
+# Get absolute path to Git repo root
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Now call the script using absolute path
+"$REPO_ROOT/source/scripts/update_version.sh" --pre-commit

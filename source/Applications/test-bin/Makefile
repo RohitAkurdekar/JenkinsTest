@@ -1,34 +1,37 @@
+TARGET         := test-bin
 include ../../CommonMakefile.mk
+BUILD_DIR      := .build_$(ARCH)
+SRC_DIR        := src
+INCLUDES := \
+	-Iinclude \
+	-I$(LIBRARIES_DIR)/libakutils/include \
+	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
+OBJ_DIR        := $(BUILD_DIR)/src
+OBJS           := $(OBJ_DIR)/testMain.o
+CXX            := g++
+CXXFLAGS       += -Wall -Werror $(INCLUDES)
+LDFLAGS        += -L$(LIBRARIES_DIR)/libakutils/.build_$(ARCH)
+LDFLAGS        += -lakutils
 
-TARGET ?= native
-SRC_DIR := src
-INCLUDE_DIR := include
-BUILD_DIR := .build
-OUT_DIR := output
+# Color codes
+YELLOW := \033[1;33m
+NC := \033[0m
 
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
+.PHONY: all clean
 
-BIN := $(BUILD_DIR)/test-bin
+all: $(BUILD_DIR)/$(TARGET)
+	@echo "$(YELLOW)[STAGE]$(NC) Build Complete: $(TARGET)"
 
-CXXFLAGS += -I$(INCLUDE_DIR)
+$(BUILD_DIR)/$(TARGET): $(OBJS)
+	@echo "$(YELLOW)[STAGE]$(NC) Linking Application: $(TARGET)"
+	@$(CXX) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	@echo "$(YELLOW)[Compiling]$(NC) $<"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
-all: $(BIN)
-
-$(BIN): $(OBJS)
-	$(CXX) $^ -o $@
-	$(STRIP) $@
-
-install:
-	@mkdir -p $(INSTALL_PATH)/usr/bin
-	cp $(BIN) $(INSTALL_PATH)/usr/bin
+$(OBJ_DIR):
+	@mkdir -p $@
 
 clean:
-	rm -rf $(BUILD_DIR) $(OUT_DIR)
-
--include $(DEPS)
+	@rm -rf $(BUILD_DIR)
