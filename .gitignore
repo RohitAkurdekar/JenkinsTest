@@ -1,2 +1,5 @@
 JenkinsHome/*
 !JenkinsHome/.gitignore
+.vscode
+./**/.build*
+.build*
