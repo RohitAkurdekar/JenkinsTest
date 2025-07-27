@@ -11,7 +11,7 @@ The **nlohmann/json** library is a modern C++ library for working with JSON. It 
 
 ## Example Usage
 ```cpp
-#include <nlohmann/json.hpp>
+#include <nlohmann-json/json.hpp>
 using json = nlohmann::json;
 
 int main() {
