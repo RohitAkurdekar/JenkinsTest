@@ -1,5 +1,5 @@
 TARGET         := test-bin
-VERSION		:= 1.0.5
+VERSION		:= 1.0.6
 include ../../CommonMakefile.mk
 BUILD_DIR      := .build_$(ARCH)
 SRC_DIR        := src
