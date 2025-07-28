@@ -1,5 +1,5 @@
 TARGET         := libakutils.so
-VERSION 	  := 1.0.2
+VERSION 	  := 1.0.3
 include ../../CommonMakefile.mk
 BUILD_DIR      := .build_$(ARCH)
 SRC_DIR        := src
