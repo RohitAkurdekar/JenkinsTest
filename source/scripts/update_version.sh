@@ -32,12 +32,20 @@ function get_current_version() {
   grep -oP "$VERSION_VAR\s*:=\s*\K[0-9.]+" "$1"
 }
 
+# Usage: bump_version "1.0.0"  -> prints "1.0.1"
 function bump_version() {
   local old="$1"
-  local major=${old%%.*}
-  local minor=${old#*.}
-  minor=$((minor + 1))
-  printf "${major}.${minor} \n"
+  local major minor patch
+
+  IFS='.' read -r major minor patch <<< "$old"
+
+  if [[ -z "$major" || -z "$minor" || -z "$patch" ]]; then
+    echo "Invalid version format. Use MAJOR.MINOR.PATCH" >&2
+    return 1
+  fi
+
+  patch=$((patch + 1))
+  echo "${major}.${minor}.${patch}"
 }
 
 function update_versions() {

@@ -1,4 +1,5 @@
 TARGET         := test-bin
+VERSION		:= 1.0.2
 include ../../CommonMakefile.mk
 BUILD_DIR      := .build_$(ARCH)
 SRC_DIR        := src
@@ -32,6 +33,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 
 $(OBJ_DIR):
 	@mkdir -p $@
+
+install:
+	@echo "$(YELLOW)[STAGE]$(NC) Installing: $(TARGET)"
+	@install -Dm755 $(BUILD_DIR)/$(TARGET) $(DEST)/$(TARGET)
+	@echo "$(TARGET): $(VERSION)" > $(DEST)/version.txt
 
 clean:
 	@rm -rf $(BUILD_DIR)
