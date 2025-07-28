@@ -50,15 +50,14 @@ build_module() {
     printf "${color_yellow}Done. ${color_reset}\n"
 }
 
+# Build Libraries (go to usr/lib)
+for lib in "$ROOT_DIR/Libraries"/*; do
+    [ -d "$lib" ] && build_module "$lib" "lib" "$LIB_DIR"
+done
 
 # Build Applications (go to usr/bin)
 for app in "$ROOT_DIR/Applications"/*; do
     [ -d "$app" ] && build_module "$app" "bin" "$BIN_DIR"
-done
-
-# Build Libraries (go to usr/lib)
-for lib in "$ROOT_DIR/Libraries"/*; do
-    [ -d "$lib" ] && build_module "$lib" "lib" "$LIB_DIR"
 done
 
 # Final tarball
