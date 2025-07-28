@@ -2,52 +2,49 @@ pipeline {
     agent any
 
     environment {
-        TAG_NAME = ''
-        BRANCH_NAME = 'production' // Used for checking the base branch of the tag
+        GIT_TAG = ''
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "${env.GIT_BRANCH}"]],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/RohitAkurdekar/JenkinsTest.git'  // or actual remote if applicable
-                    ]]
-                ])
-            }
-        }
-
-        stage('Validate Tag on Production') {
+        stage('Detect Tag and Base Branch') {
             steps {
                 script {
-                    // Extract tag name from GIT_BRANCH (refs/tags/v1.2.3 -> v1.2.3)
-                    TAG_NAME = env.GIT_BRANCH.replaceFirst(/^refs\/tags\//, "")
-                    echo "Detected tag: ${TAG_NAME}"
+                    // Get tag name
+                    def ref = sh(script: "git describe --tags --exact-match HEAD || true", returnStdout: true).trim()
 
-                    // Check if the tag is on production branch
-                    def baseBranch = sh(
-                        script: "git merge-base --all ${TAG_NAME} origin/production > /dev/null && echo true || echo false",
+                    if (!ref) {
+                        echo "Not a tag. Exiting."
+                        currentBuild.result = 'NOT_BUILT'
+                        error("Build not triggered by a Git tag.")
+                    }
+
+                    GIT_TAG = ref
+                    echo "Detected Git tag: ${GIT_TAG}"
+
+                    // Fetch full origin refs (ensure we have production)
+                    sh "git remote set-url origin https://github.com/RohitAkurdekar/JenkinsTest.git"
+                    sh "git fetch origin production"
+
+                    // Check if tag commit is reachable from production
+                    def isBased = sh(
+                        script: "git merge-base --is-ancestor ${GIT_TAG} origin/production && echo yes || echo no",
                         returnStdout: true
                     ).trim()
 
-                    if (baseBranch != "true") {
-                        echo "Tag ${TAG_NAME} is not based on production branch."
+                    if (isBased != 'yes') {
+                        echo "Tag ${GIT_TAG} is NOT based on production branch."
                         currentBuild.result = 'NOT_BUILT'
-                        error("Tag is not on production.")
+                        error("Tag is not from production.")
                     }
 
-                    echo "Tag ${TAG_NAME} is valid and on production branch."
+                    echo "Tag ${GIT_TAG} is based on production branch."
                 }
             }
         }
 
-        stage('Build for Tag') {
+        stage('Build') {
             steps {
-                echo "Building for tag: ${TAG_NAME}"
+                echo "Running build for tag: ${GIT_TAG}"
                 sh './Build.sh'
             }
         }
