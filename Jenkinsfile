@@ -45,7 +45,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Running build for tag: ${GIT_TAG}"
-                sh './Build.sh'
+                sh './source/Build.sh'
             }
         }
     }
