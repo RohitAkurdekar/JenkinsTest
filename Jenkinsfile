@@ -48,5 +48,11 @@ pipeline {
                 sh './source/Build.sh'
             }
         }
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: './source/build/output-*.tar.gz', fingerprint: true
+            }
+        }
+
     }
 }

@@ -1,80 +1,76 @@
-#!/bin/bash
-set -e
+#!/bin/sh
 
-ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-VERSION_VAR="VERSION"
-DRY_RUN=false
-PRECOMMIT=false
-NEW_VERSION=""
+# Color definitions
+RED='\033[0;31m'
+GRN='\033[0;32m'
+YEL='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-color_yellow='\033[1;33m'
-color_green='\033[1;32m'
-color_reset='\033[0m'
+# Get Git root
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+SOURCE_DIR="$REPO_ROOT/source"
 
-function usage() {
-  printf "Usage: $0 [--dry-run] [--pre-commit] \n"
-  exit 1
+# Find all Makefiles under source/
+find_makefiles() {
+    find "$ROOT_DIR/source" -type f -name Makefile
 }
 
-function log_info() {
-  printf "${color_yellow}[update-version]${color_reset} $1 \n"
+# Extract version from version.txt near Makefile
+get_version() {
+    cat $1 | grep -E '^[[:space:]]*VERSION[[:space:]]*:?=' | sed -E 's/^[[:space:]]*VERSION[[:space:]]*:?=[[:space:]]*//'
 }
 
-function log_success() {
-  printf "${color_green}[updated]${color_reset} $1 \n"
+# Update version in Makefile
+update_makefile() {
+    local makefile="$1"
+    local version="$2"
+    if [ -z "$version" ]; then return; fi
+
+    # Replace VERSION := ... line
+    sed -i "s/^VERSION := .*/VERSION := $version/" "$makefile"
 }
 
-function find_makefiles() {
-  find "$ROOT_DIR" -type f -name "Makefile" ! -path "*/.build_native/*"
+# Dry-run print
+dry_run_info() {
+    local makefile="$1"
+    local version="$2"
+    if [ -z "$version" ]; then return; fi
+    rel_out="${makefile#$ROOT_DIR/}"
+    printf "${YEL}[DRY RUN]${NC} Would update %s to version ${GRN}%s${NC}\n" "$rel_out" "$version"
 }
 
-function get_current_version() {
-  grep -oP "$VERSION_VAR\s*:=\s*\K[0-9.]+" "$1"
-}
+# Main function
+main() {
+    mode="all"
 
-# Usage: bump_version "1.0.0"  -> prints "1.0.1"
-function bump_version() {
-  local old="$1"
-  local major minor patch
+    [ "$1" = "--pre-commit" ] && mode="git"
+    [ "$1" = "--dry-run" ] && mode="dry"
 
-  IFS='.' read -r major minor patch <<< "$old"
-
-  if [[ -z "$major" || -z "$minor" || -z "$patch" ]]; then
-    echo "Invalid version format. Use MAJOR.MINOR.PATCH" >&2
-    return 1
-  fi
-
-  patch=$((patch + 1))
-  echo "${major}.${minor}.${patch}"
-}
-
-function update_versions() {
-  for file in $(find_makefiles); do
-    current=$(get_current_version "$file" || echo "0.0")
-    new_version=$(bump_version "$current")
-    sed -i "s/\($VERSION_VAR\s*:=\s*\).*/\1$new_version/" "$file"
-    log_success "${file#$ROOT_DIR/}: $current → $new_version"
-    if $PRECOMMIT; then
-      git add "$file"
+    if [ "$mode" = "git" ]; then
+        printf "${YEL}Updating Makefiles from Git staged changes only...${NC}\n"
+        files=$(git diff --cached --name-only | grep -E '(^|/)Makefile$')
+    else
+        printf "${YEL}Scanning all Makefiles under source/...${NC}\n"
+        files=$(find_makefiles)
     fi
-  done
+
+    for makefile in $files; do
+        version=$(get_version "$makefile")
+
+        if [ -z "$version" ]; then
+            printf "${RED}Skipping: No version found for ${makefile}${NC}\n"
+            continue
+        fi
+
+        if [ "$mode" = "dry" ]; then
+            dry_run_info "$makefile" "$version"
+        else
+            rel_out="${makefile#$ROOT_DIR/}"
+            printf "${GRN}Updating ${rel_out} -> VERSION := ${version}${NC}\n"
+            update_makefile "$makefile" "$version"
+        fi
+    done
 }
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --dry-run) DRY_RUN=true ;;
-    --pre-commit) PRECOMMIT=true ;;
-    *) usage ;;
-  esac
-  shift
-done
-
-if $DRY_RUN; then
-  for file in $(find_makefiles); do
-    cur=$(get_current_version "$file")
-    new=$(bump_version "$cur")
-    printf "${file#$ROOT_DIR/}: $cur → $new \n"
-  done
-else
-  update_versions
-fi
+main "$@"
