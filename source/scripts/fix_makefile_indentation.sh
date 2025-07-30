@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# --------------------------------------------------------------------------------------------
 # @file: fix_makefile_indentation.sh
 # @brief: Fix indentation in Makefiles or *.mk files to use tabs instead of spaces
 # @usage: ./fix_makefile_indentation.sh <file1.mk> [file2.mk ...]
@@ -6,6 +8,7 @@
 # @note: This script is intended to be run in a Unix-like environment with bash and awk available.
 # @note: It is recommended to back up your Makefiles before running this script, as it modifies files in place.
 # @author: Rohit Akurdekar
+# --------------------------------------------------------------------------------------------
 
 set -e
 

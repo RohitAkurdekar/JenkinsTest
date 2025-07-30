@@ -9,7 +9,7 @@ BUILD_DIR   := .build_$(ARCH)
 SRC_DIR     := src
 INCLUDES := \
 	-Iinclude \
-    -I$(LIBRARIES_DIR)/libakutils/include \
+	-I$(LIBRARIES_DIR)/libakutils/include \
 	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
 OBJ_DIR     := $(BUILD_DIR)/src
 SRCS     := $(wildcard $(SRC_DIR)/*.cpp)

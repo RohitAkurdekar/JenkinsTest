@@ -1,4 +1,21 @@
 #!/bin/bash
+
+# --------------------------------------------------------------------------------------------
+# @file   align_makefiles.sh
+# @brief  Align Makefile variable assignments for better readability.
+# @usage  source/scripts/align_makefiles.sh [--pre-commit|--dry-run]
+# @note   This script formats Makefile variable assignments to align them for better readability.
+#        It can be run as a pre-commit hook or manually.
+# @options
+#         --pre-commit  Only format Makefiles that are staged for commit.
+#         --dry-run     Perform a dry run without making changes.
+# @example
+#         source/scripts/align_makefiles.sh --pre-commit
+#         source/scripts/align_makefiles.sh --dry-run
+# @requires git, awk, sed, grep, find
+# @author  Rohit Akurdekar
+# --------------------------------------------------------------------------------------------
+
 set -e
 
 # ────────────────
@@ -28,20 +45,22 @@ find_makefiles() {
         printf "${COLOR_YELLOW}Scanning all Makefiles under source/...${NC}\n">&2
         find "$ROOT_DIR/source" -type f \( -iname makefile -o -iname '*.mk' \)
     fi
+    echo "files found"
 }
 
 printf "${COLOR_YELLOW}[STAGE]${COLOR_GREEN} Scanning for staged Makefile changes... ${COLOR_RESET} \n"
 
 # Find staged Makefiles
 files=$(find_makefiles "$1")
+
 # If no files found, exit early
 if [ -z "$files" ]; then
-    printf "${COLOR_CYAN}[INFO]${COLOR_RESET} No Makefile changes staged.\n"
+    printf "${COLOR_GREEN}[INFO]${COLOR_RESET} No Makefile changes staged.\n"
     exit 0
 fi
 
 if [ -z "$files" ]; then
-    printf "${COLOR_CYAN}[INFO]${COLOR_RESET} No Makefile changes staged.\n"
+    printf "${COLOR_GREEN}[INFO]${COLOR_RESET} No Makefile changes staged.\n"
     exit 0
 fi
 
@@ -97,3 +116,9 @@ for file in $files; do
 done
 
 printf "${COLOR_GREEN}[SUCCESS]${COLOR_RESET} Makefile formatting complete.\n"
+
+# If running as a pre-commit hook, exit with success
+if [ "$1" = "--pre-commit" ]; then
+    printf "${COLOR_CYAN}[INFO]${COLOR_RESET} Pre-commit hook completed successfully.\n"
+    exit 0
+fi
