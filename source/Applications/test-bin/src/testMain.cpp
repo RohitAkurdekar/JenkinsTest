@@ -1,3 +1,10 @@
+/*************************************************************************
+ * @file testMain.cpp
+ * @brief Main application for testing JSON utilities.
+ * @details This file contains the main function of tests bin.
+ * @author Rohit Akurdekar
+ ************************************************************************/
+
 #include "testMain.h"
 
 int main() {
@@ -20,3 +27,5 @@ int main() {
 
     return 0;
 }
+
+// End of file: testMain.cpp

@@ -1,16 +1,32 @@
 #!/bin/sh
 
+# ---------------------------------------------------------------------------------------------------------------------
+# @file    commit-msg
+# @brief   Git commit-msg hook to enforce Jira ticket in commit messages
+# @details This script checks if the commit message starts with a Jira ticket in the format SCRUM-123.
+# @author  Rohit Akurdekar
+# @version 1.0.0
+# ---------------------------------------------------------------------------------------------------------------------
+
 COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
-echo "[Hook] Checking commit message for Jira ticket..."
+# Color codes for output
+color_red='\033[1;31m'
+color_blue='\033[1;34m'
+color_yellow='\033[1;33m'
+color_green='\033[1;32m'
+color_reset='\033[0m'
+BOLD="\e[1m"
+
+printf "${color_blue}[Hook] Checking commit message for Jira ticket...${color_reset}\n"
 
 # Require 'SCRUM-' followed by 1 or more digits
 if ! echo "$COMMIT_MSG" | grep -qE '^SCRUM-[0-9]+'; then
-  echo "❌ Commit message must start with a Jira ticket like: SCRUM-123"
+  printf "Commit message must start with a Jira ticket like: ${color_yellow}SCRUM-123${color_reset}\n"
   exit 1
 fi
 
-echo "✅ Jira ticket found: $(echo "$COMMIT_MSG" | grep -oE 'SCRUM-[0-9]+')"
 exit 0
 
+# EOF commit-msg

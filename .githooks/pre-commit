@@ -1,26 +1,50 @@
 #!/bin/sh
 
-echo "Pre-Commit task Running..."
-echo "\033[34m=> [Hook] Running clang-format on staged files...\033[0m "
+# ---------------------------------------------------------------------------------------------------------------------
+# @file    pre-commit
+# @brief   Git pre-commit hook to run clang-format and update version
+# @details This script formats staged C++ files using clang-format and updates the version using update_version.sh.
+# @author  Rohit Akurdekar
+# @version 1.0.0
+# ---------------------------------------------------------------------------------------------------------------------
 
-FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|h|c|hpp)$')
 
-for file in $FILES; do
-    echo "\033[1;33mProcessing file: $file\033[0m "
-    case "$file" in
-        *ThirdPartyLibs*)
-            echo "Skipping ThirdPartyLibs: $file"
-            continue
-            ;;
-    esac
-    clang-format -i "$file"
-    git add "$file"
-done
-
-echo "\033[34m=> [Hook] Running update_version.sh...\033[0m "
+# Color codes for output
+color_red='\033[1;31m'
+color_blue='\033[1;34m'
+color_yellow='\033[1;33m'
+color_green='\033[1;32m'
+color_reset='\033[0m'
+BOLD="\e[1m"
 
 # Get absolute path to Git repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
+printf "${BOLD}Pre-Commit task Running...${color_reset}\n"
+printf "${color_blue}===> [Hook] Running clang-format on staged files... ${color_reset}\n"
+
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|h|c|hpp)$')
+
+for file in $FILES; do
+    case "$file" in
+        *ThirdPartyLibs*)
+            echo "Skipping ThirdPartyLibs: $rel_out"
+            continue
+            ;;
+    esac
+
+    rel_out="${file#$ROOT_DIR/}"
+    echo "${color_yellow}Processing file: $rel_out ${color_reset} \n"
+    clang-format -i "$file"
+    git add "$file"
+done
+
 # Now call the script using absolute path
+printf "${color_blue}===> [Hook] Running update_version.sh...${color_reset} \n"
 "$REPO_ROOT/source/scripts/update_version.sh" --pre-commit
+
+# Run the align_makefiles script
+printf "${color_blue}===> [Hook] Running align_makefiles.sh...${color_reset} \n"
+"$REPO_ROOT/source/scripts/align_makefiles.sh" --pre-commit
+
+# EOF pre-commit
