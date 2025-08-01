@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# ------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 # @file: create_structure.sh
-# @brief: Script to create directory structure for applications, libraries
-#   , third-party libraries, and microservices.
+# @brief: Script to create directory structure for applications, libraries, third-party libraries, and microservices.
 # @description: This script creates the necessary directories and Makefiles
 #   for building applications, libraries, and microservices.
 # @note: This script is intended to be run from the source directory.
@@ -18,8 +17,24 @@
 # └── README.md
 # Ensure the script is run from the source directory
 #
+# @usage: source/scripts/create_structure.sh [applications|libraries|thirdparty|microservices|ALL]
+# @requires git, mkdir, sed, awk
+# @options:
+#         applications   Create application directories
+#         libraries      Create library directories
+#         thirdparty     Create third-party library directories
+#         microservices  Create microservices and extension modules directories
+#         ALL            Create all directory types
+# @note: The script will prompt for the number of directories to create and their names.
+# @note: It will also generate a CommonMakefile.mk and a build.sh script in the source directory.
+# @note: The build.sh script will build all applications and libraries and install
+#         the binaries and libraries to the output directory.
+# @note: The CommonMakefile.mk will contain common build settings and paths.
+# @note: The script will also create a README.md file in the source directory.
 # @author: Rohit Akurdekar
-# ------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
+
+set -e
 
 # Check if a parameter is provided
 if [ -z "$1" ]; then
@@ -33,7 +48,7 @@ color_blue='\033[1;34m'
 color_yellow='\033[1;33m'
 color_green='\033[1;32m'
 color_reset='\033[0m'
-BOLD="\e[1m"
+BOLD='\e[1m'
 
 # Get absolute path to Git repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -186,76 +201,76 @@ create_microservices() {
 # Function to generate the Build.sh script
 generate_build_script() {
     cat > ${SOURCE_DIR}/build.sh <<EOL
-    #!/bin/bash
-    ### Build.sh for source directory ###
-    # This script builds all applications and libraries in the source directory
-    # It compiles each module and installs the binaries and libraries to the output directory
+#!/bin/bash
+### Build.sh for source directory ###
+# This script builds all applications and libraries in the source directory
+# It compiles each module and installs the binaries and libraries to the output directory
 
-    set -e
+set -e
 
-    ROOT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
-    ROOT_DIR="\$ROOT_DIR/source"
-    BUILD_ROOT="\$ROOT_DIR/build"
-    OUTPUT_DIR="\$BUILD_ROOT/output-\$(date +%Y%m%d_%H%M%S)"
-    BIN_DIR="\$OUTPUT_DIR/usr/bin"
-    LIB_DIR="\$OUTPUT_DIR/usr/lib"
-    VERSION_FILE="\$OUTPUT_DIR/version.txt"
+ROOT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="\$ROOT_DIR/source"
+BUILD_ROOT="\$ROOT_DIR/build"
+OUTPUT_DIR="\$BUILD_ROOT/output-\$(date +%Y%m%d_%H%M%S)"
+BIN_DIR="\$OUTPUT_DIR/usr/bin"
+LIB_DIR="\$OUTPUT_DIR/usr/lib"
+VERSION_FILE="\$OUTPUT_DIR/version.txt"
 
 
-    color_yellow='\033[1;33m'
-    color_green='\033[1;32m'
-    color_reset='\033[0m'
+color_yellow='\033[1;33m'
+color_green='\033[1;32m'
+color_reset='\033[0m'
 
-    rm -rf \${BUILD_ROOT}/*
+rm -rf \${BUILD_ROOT}/*
 
-    mkdir -p "\$BIN_DIR" "\$LIB_DIR"
-    rel_out="\${OUTPUT_DIR#\$ROOT_DIR/}"
-    printf "\${color_yellow}Starting build: \${color_green}\$rel_out\${color_reset} \n"
-    echo "Build Timestamp: \$(date)\n" > "\$VERSION_FILE"
+mkdir -p "\$BIN_DIR" "\$LIB_DIR"
+rel_out="\${OUTPUT_DIR#\$ROOT_DIR/}"
+printf "\${color_yellow}Starting build: \${color_green}\$rel_out\${color_reset} \n"
+echo "Build Timestamp: \$(date)\n" > "\$VERSION_FILE"
 
-    build_module() {
-        local module_dir="\$1"
-        local type="\$2"  # "bin" or "lib"
-        local dest_dir="\$3"
+build_module() {
+    local module_dir="\$1"
+    local type="\$2"  # "bin" or "lib"
+    local dest_dir="\$3"
 
-        # Relative paths (trim \$ROOT_DIR/)
-        local rel_module="\${module_dir#\$ROOT_DIR/}"
-        local rel_dest="\${dest_dir#\$ROOT_DIR/}"
+    # Relative paths (trim \$ROOT_DIR/)
+    local rel_module="\${module_dir#\$ROOT_DIR/}"
+    local rel_dest="\${dest_dir#\$ROOT_DIR/}"
 
-        printf "\n\${color_yellow}Building====>\${color_reset} \$rel_module -> \$rel_dest\n"
+    printf "\n\${color_yellow}Building====>\${color_reset} \$rel_module -> \$rel_dest\n"
 
-        if [ -f "\$module_dir/Makefile" ]; then
-            make -C "\$module_dir" --no-print-directory clean
-            make -C "\$module_dir" --no-print-directory
-            make -C "\$module_dir" --no-print-directory DEST="\$dest_dir" install
+    if [ -f "\$module_dir/Makefile" ]; then
+        make -C "\$module_dir" --no-print-directory clean
+        make -C "\$module_dir" --no-print-directory
+        make -C "\$module_dir" --no-print-directory DEST="\$dest_dir" install
 
-            local module_name
-            module_name="\$(basename "\$module_dir")"
+        local module_name
+        module_name="\$(basename "\$module_dir")"
 
-            local version_file="\$dest_dir/version.txt"
-            local version="unknown"
-            [ -f "\$version_file" ] && version="\$(cat "\$version_file")"
+        local version_file="\$dest_dir/version.txt"
+        local version="unknown"
+        [ -f "\$version_file" ] && version="\$(cat "\$version_file")"
 
-            printf "\${type^}/\${module_name}: \$version\n" >> "\$VERSION_FILE"
-        fi
-        printf "\${color_yellow}Done. \${color_reset}\n"
-    }
+        printf "\${type^}/\${module_name}: \$version\n" >> "\$VERSION_FILE"
+    fi
+    printf "\${color_yellow}Done. \${color_reset}\n"
+}
 
-    # Build Libraries (go to usr/lib)
-    for lib in "\$ROOT_DIR/Libraries"/*; do
-        [ -d "\$lib" ] && build_module "\$lib" "lib" "\$LIB_DIR"
-    done
+# Build Libraries (go to usr/lib)
+for lib in "\$ROOT_DIR/Libraries"/*; do
+    [ -d "\$lib" ] && build_module "\$lib" "lib" "\$LIB_DIR"
+done
 
-    # Build Applications (go to usr/bin)
-    for app in "\$ROOT_DIR/Applications"/*; do
-        [ -d "\$app" ] && build_module "\$app" "bin" "\$BIN_DIR"
-    done
+# Build Applications (go to usr/bin)
+for app in "\$ROOT_DIR/Applications"/*; do
+    [ -d "\$app" ] && build_module "\$app" "bin" "\$BIN_DIR"
+done
 
-    # Final tarball
-    cd "\$BUILD_ROOT"
-    tar -cvzf "\$BUILD_ROOT/output-\$(date +%Y%m%d).tar.gz" "\$(basename "\$OUTPUT_DIR")"
+# Final tarball
+cd "\$BUILD_ROOT"
+tar -czf "\$BUILD_ROOT/output-\$(date +%Y%m%d).tar.gz" "\$(basename "\$OUTPUT_DIR")"
 
-    printf "\${color_yellow}Build complete. Output:\${color_reset} output-\$(date +%Y%m%d).tar.gz\n"
+printf "\${color_yellow}Build complete. Output:\${color_reset} output-\$(date +%Y%m%d).tar.gz\n"
 
 EOL
     chmod +x ${SOURCE_DIR}/build.sh

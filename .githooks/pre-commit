@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# ---------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 # @file    pre-commit
 # @brief   Git pre-commit hook to run clang-format and update version
 # @details This script formats staged C++ files using clang-format and updates the version using update_version.sh.
+# @requires git, clang-format, source/scripts/update_version.sh, source/scripts/align_makefiles.sh
 # @author  Rohit Akurdekar
-# @version 1.0.0
-# ---------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 
 # Color codes for output
@@ -15,7 +15,7 @@ color_blue='\033[1;34m'
 color_yellow='\033[1;33m'
 color_green='\033[1;32m'
 color_reset='\033[0m'
-BOLD="\e[1m"
+BOLD='\e[1m'
 
 # Get absolute path to Git repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)

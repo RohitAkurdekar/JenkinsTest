@@ -1,19 +1,19 @@
 ### Makefile for Libraries/libakutils  ###
 include ../../CommonMakefile.mk
 
-TARGET    := libakutils.so
-DEST        ?= usr/lib
-ARCH        ?= native
-VERSION   := 1.0.0
-BUILD_DIR := .build_$(ARCH)
-SRC_DIR   := src
-INCLUDES := \
+TARGET		:= libakutils.so
+DEST		?= usr/lib
+ARCH		?= native
+VERSION		:= 1.0.0
+BUILD_DIR	:= .build_$(ARCH)
+SRC_DIR		:= src
+INCLUDES	:= \
 	-Iinclude \
 	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
-OBJ_DIR   := $(BUILD_DIR)/src
-SRCS      := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS      := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
-CXXFLAGS  += $(INCLUDES)
+OBJ_DIR		:= $(BUILD_DIR)/src
+SRCS		:= $(wildcard $(SRC_DIR)/*.cpp)
+OBJS		:= $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+CXXFLAGS	+= $(INCLUDES)
 
 .PHONY: all clean
 
