@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# --------------------------------------------------------------------------------------------
+# @file: build.sh
+# @brief: This script builds all applications and libraries in the source directory.
+# @description: It compiles each module and installs the binaries and libraries to the output directory
+# @usage: ./build.sh
+# @note: This script is intended to be run from the source directory.
+# @note: It requires a Makefile in each application and library directory.
+# @note: The output directory will be created with a timestamp.
+# @requires bash, make
+# @author: Rohit Akurdekar
+# --------------------------------------------------------------------------------------------
+
 set -e
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -62,6 +74,7 @@ done
 
 # Final tarball
 cd "$BUILD_ROOT"
-tar czf "$BUILD_ROOT/output-$(date +%Y%m%d).tar.gz" "$(basename "$OUTPUT_DIR")"
+tar -czf "$BUILD_ROOT/output-$(date +%Y%m%d).tar.gz" "$(basename "$OUTPUT_DIR")"
 
 printf "${color_yellow}Build complete. Output:${color_reset} output-$(date +%Y%m%d).tar.gz\n"
+

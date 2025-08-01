@@ -1,42 +1,42 @@
-TARGET         := libakutils.so
-VERSION 	  := 1.0.6
+### Makefile for Libraries/libakutils  ###
 include ../../CommonMakefile.mk
-BUILD_DIR      := .build_$(ARCH)
-SRC_DIR        := src
-INCLUDES := \
+
+TARGET		:= libakutils.so
+DEST		?= usr/lib
+ARCH		?= native
+VERSION		:= 1.0.0
+BUILD_DIR	:= .build_$(ARCH)
+SRC_DIR		:= src
+INCLUDES	:= \
 	-Iinclude \
 	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
-
-OBJ_DIR        := $(BUILD_DIR)/src
-OBJS           := $(OBJ_DIR)/akJsonUtils.o
-CXX            := g++
-CXXFLAGS       += -Wall -Werror -fPIC $(INCLUDES)
-LDFLAGS        += -shared
-
-# Color codes
-YELLOW := \033[1;33m
-NC := \033[0m
+OBJ_DIR		:= $(BUILD_DIR)/src
+SRCS		:= $(wildcard $(SRC_DIR)/*.cpp)
+OBJS		:= $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+CXXFLAGS	+= $(INCLUDES)
 
 .PHONY: all clean
 
 all: $(BUILD_DIR)/$(TARGET)
-	@echo "$(YELLOW)[STAGE]$(NC) Built $(TARGET)"
+	@printf "$(COLOR_YELLOW)[STAGE]$(COLOR_RESET) Build Complete: $(TARGET)\n"
 
 $(BUILD_DIR)/$(TARGET): $(OBJS)
-	@echo "$(YELLOW)[STAGE]$(NC) Building Shared Library: $(TARGET)"
-	@$(CXX) $(LDFLAGS) -o $@ $^
+	@printf "$(COLOR_YELLOW)[STAGE]$(COLOR_RESET) Linking Application: $(TARGET)\n"
+	@$(CXX) -shared -o $@ $^ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	@echo "$(YELLOW)[Compiling]$(NC) $<"
+	@printf "$(COLOR_YELLOW)[Compiling]$(COLOR_RESET) $<\n"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
 	@mkdir -p $@
 
 install:
-	@echo "$(YELLOW)[STAGE]$(NC) Installing: $(TARGET)"
+	@printf "$(COLOR_YELLOW)[STAGE]$(COLOR_RESET) Installing: $(TARGET)\n"
 	@install -Dm755 $(BUILD_DIR)/$(TARGET) $(DEST)/$(TARGET)
 	@echo "$(TARGET): $(VERSION)" > $(DEST)/version.txt
 
 clean:
 	@rm -rf $(BUILD_DIR)
+
+# EoF makefile
