@@ -1,3 +1,9 @@
+/**********************************************************************************************
+ * @file Jenkinsfile
+ * @description Jenkins pipeline to build and archive artifacts based on Git tags.
+ * @author Rohit Akurdekar
+ *********************************************************************************************/
+
 pipeline {
     agent any
 
@@ -45,7 +51,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Running build for tag: ${GIT_TAG}"
-                sh './source/Build.sh'
+                sh './source/build.sh'
             }
         }
         stage('Archive') {
@@ -56,3 +62,6 @@ pipeline {
 
     }
 }
+
+
+// Eof Jenkinsfile
