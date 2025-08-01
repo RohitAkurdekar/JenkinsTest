@@ -56,7 +56,8 @@ pipeline {
         }
         stage('Archive') {
             steps {
-                archiveArtifacts artifacts: './source/build/output-*.tar.gz', fingerprint: true
+                echo "Archieving artifacts for tag: ${GIT_TAG}"
+                archiveArtifacts artifacts: 'source/build/output-*.tar.gz', fingerprint: true
             }
         }
 
