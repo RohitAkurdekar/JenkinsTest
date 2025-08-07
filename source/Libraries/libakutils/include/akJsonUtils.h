@@ -1,3 +1,12 @@
+/*********************************************************************************************
+ * @file akJsonUtils.h
+ * @brief Header file for JSON utility functions.
+ * @details This file declares functions for parsing JSON strings and copying parameters between
+ *JSON objects.
+ * @author Rohit Akurdekar
+ * @note This file is part of the libakutils library.
+ ********************************************************************************************/
+
 #ifndef AKUTILS_H
 #define AKUTILS_H
 

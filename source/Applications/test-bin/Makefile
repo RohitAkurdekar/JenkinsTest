@@ -7,11 +7,10 @@ ARCH        ?= native
 VERSION     := 1.0.0
 BUILD_DIR   := .build_$(ARCH)
 SRC_DIR     := src
-INCLUDES := \
-	-Iinclude \
+INCLUDES := -Iinclude \
 	-I$(LIBRARIES_DIR)/libakutils/include \
 	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
-OBJ_DIR     := $(BUILD_DIR)/src
+OBJ_DIR  := $(BUILD_DIR)/src
 SRCS     := $(wildcard $(SRC_DIR)/*.cpp)
 OBJS     := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 CXXFLAGS += $(INCLUDES)

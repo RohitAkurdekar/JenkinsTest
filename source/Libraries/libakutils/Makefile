@@ -7,8 +7,7 @@ ARCH		?= native
 VERSION		:= 1.0.0
 BUILD_DIR	:= .build_$(ARCH)
 SRC_DIR		:= src
-INCLUDES	:= \
-	-Iinclude \
+INCLUDES := -Iinclude \
 	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
 OBJ_DIR		:= $(BUILD_DIR)/src
 SRCS		:= $(wildcard $(SRC_DIR)/*.cpp)

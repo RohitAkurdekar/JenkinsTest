@@ -1,3 +1,11 @@
+/*********************************************************************************************
+ * @file akJsonUtils.cpp
+ * @brief Implementation of JSON utility functions.
+ * @details This file contains functions for parsing JSON strings and copying parameters between
+ *JSON objects.
+ * @author Rohit Akurdekar
+ ********************************************************************************************/
+
 #include "akJsonUtils.h"
 
 #include <iostream>
@@ -59,3 +67,5 @@ bool JsonUtils::copyJsonParam(json& jIn, const std::string& inParam, json& jOut,
         return false;
     }
 }
+
+// End of file: akJsonUtils.cpp
