@@ -1,0 +1,31 @@
+---
+- name: Build Project using Makefile
+  hosts: localhost
+  tasks:
+
+    - name: Ensure Make is installed
+      become: true
+      apt:
+        name: make
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: List top-level files
+      command: ls -l /data/source
+      register: output
+    - debug:
+        var: output.stdout_lines
+
+    - name: Build project via Make
+      command: make
+      register: make_output
+      args:
+        chdir: /data/source/Applications/test-bin
+    - debug:
+        var: make_output.stdout_lines
+
+    - name: Build using script
+      command: sh /data/source/build.sh
+      register: script_output
+    - debug:
+        var: script_output.stdout_lines

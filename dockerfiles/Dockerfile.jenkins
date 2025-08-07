@@ -1,0 +1,22 @@
+# --------------------------------------------------------------------------------------------
+# Dockerfile for Jenkins
+# This Dockerfile sets up a Jenkins environment
+# It uses the official Jenkins LTS image and installs necessary build tools
+# Usage: docker build -t jenkins-image .
+#
+# @author Rohit Akurdekar
+# --------------------------------------------------------------------------------------------
+
+
+FROM jenkins/jenkins:lts
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y build-essential cmake gcc g++ git curl zip unzip make && \
+    apt-get clean
+
+RUN mkdir -p /data
+VOLUME ["/data"]
+
+USER jenkins
