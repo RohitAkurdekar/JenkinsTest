@@ -4,21 +4,21 @@ This repository contains the setup for a containerized Jenkins environment with 
 
 ---
 
-## Directory and File Structure
+## 📁 Directory and File Structure
 
 ```
 root
-├── .clang-format             # Code formatting rules for C/C++ source files.
-├── .githooks/                # Custom Git hooks (e.g., pre-commit).
-├── .gitignore                # Specifies intentionally untracked files to ignore.
-├── .git/                     # Git repository metadata.
-├── docker-compose.yml        # Defines Docker services and configurations.
-├── Dockerfile                # Docker image definition for the Jenkins or build environment.
-├── Jenkinsfile               # Jenkins pipeline definition for CI/CD.
-├── JenkinsHome/              # Persistent volume for Jenkins home (plugins, jobs, config, etc.).
-├── LICENSE                   # Project licensing information.
-├── README.md                 # Project documentation (you are here).
-└── source/                   # Source code and related scripts.
+├── .clang-format         # Code formatting rules for C/C++ source files.
+├── .git/                 # Git metadata directory (version control).
+├── .gitignore            # Specifies untracked files to ignore in Git.
+├── .githooks/            # Custom Git hooks (e.g., pre-commit checks).
+├── ansible/              # Contains Ansible inventory and playbook files.
+├── dockerfiles/          # Docker-related definitions and utilities.
+├── Jenkinsfile           # Jenkins pipeline configuration for CI/CD.
+├── JenkinsHome/          # Persistent storage for Jenkins (plugins, jobs, config).
+├── LICENSE               # License for the project.
+├── README.md             # Main project documentation (this file).
+├── source/               # Project source code and build scripts.
 ```
 
 ---
