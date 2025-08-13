@@ -2,6 +2,9 @@
 SHELL := /bin/bash
 ARCH ?= native
 # Common build settings
+CC := gcc
+CFLAGS := -Wall -Wextra -fPIC
+
 CXX := g++
 CXXFLAGS += -std=c++17 -Wall -Wextra -fPIC
 LDFLAGS :=
