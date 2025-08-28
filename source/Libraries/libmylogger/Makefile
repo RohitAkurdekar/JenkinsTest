@@ -1,18 +1,17 @@
-### Makefile for Libraries/libakutils  ###
+### Makefile for Libraries/libmylogger  ###
 include ../../CommonMakefile.mk
 
-TARGET		:= libakutils.so
+TARGET    := libmylogger.so
 DEST		?= usr/lib
 ARCH		?= native
-VERSION		:= 1.0.0
-BUILD_DIR	:= .build_$(ARCH)
-SRC_DIR		:= src
-INCLUDES := -Iinclude \
-	-I$(THIRD_PARTY_DIR)/nlohmann-json/includes
-OBJ_DIR		:= $(BUILD_DIR)/src
-SRCS		:= $(wildcard $(SRC_DIR)/*.cpp)
-OBJS		:= $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
-CXXFLAGS	+= $(INCLUDES)
+VERSION   := 1.0.0
+BUILD_DIR := .build_$(ARCH)
+SRC_DIR   := src
+INCLUDES  := -Iinclude
+OBJ_DIR   := $(BUILD_DIR)/src
+SRCS      := $(wildcard $(SRC_DIR)/*.c)
+OBJS      := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
+CFLAGS    += $(INCLUDES)
 
 .PHONY: all clean
 
@@ -21,11 +20,11 @@ all: $(BUILD_DIR)/$(TARGET)
 
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	@printf "$(COLOR_YELLOW)[STAGE]$(COLOR_RESET) Linking Application: $(TARGET)\n"
-	@$(CXX) -shared -o $@ $^ $(LDFLAGS)
+	@$(CC) -shared -o $@ $^ $(LDFLAGS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	@printf "$(COLOR_YELLOW)[Compiling]$(COLOR_RESET) $<\n"
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
 	@mkdir -p $@

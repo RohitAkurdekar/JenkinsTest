@@ -1,0 +1,41 @@
+# --------------------------------------------------------------------------------------------
+# docker-compose.yml
+# This file defines the services for Jenkins and Ansible using Docker Compose.
+# It sets up the necessary configurations for building and running the containers.
+# Ensure you have Docker and Docker Compose installed to use this file.
+#
+# @note: Use makefile to build and run the containers easily.
+# @run:  `make help` to see available commands.
+# @author: Rohit Akurdekar
+# --------------------------------------------------------------------------------------------
+
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins-builder
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - ../JenkinsHome:/var/jenkins_home
+      - ../source:/data/source
+
+  ansible:
+    build:
+      context: .
+      dockerfile: Dockerfile.ansible
+    image: willhallonline/ansible
+    container_name: ansible-runner
+    volumes:
+      - ../ansible:/ansible
+      - ../source:/data/source
+    working_dir: /ansible
+    stdin_open: true
+    tty: true
+    network_mode: host
+    command: tail -f /dev/null  # keeps container running
+

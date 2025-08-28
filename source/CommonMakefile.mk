@@ -2,12 +2,15 @@
 SHELL := /bin/bash
 ARCH ?= native
 # Common build settings
+CC := gcc
+CFLAGS := -Wall -Wextra -fPIC
+
 CXX := g++
 CXXFLAGS += -std=c++17 -Wall -Wextra -fPIC
 LDFLAGS :=
 
 # Root Directory (one level above source)
-ROOT_DIR := $(shell git rev-parse --show-toplevel)
+ROOT_DIR ?= $(shell git rev-parse --show-toplevel)
 SOURCE_DIR := $(ROOT_DIR)/source
 LIBRARIES_DIR := $(SOURCE_DIR)/Libraries
 THIRD_PARTY_DIR := $(SOURCE_DIR)/ThirdPartyLibs

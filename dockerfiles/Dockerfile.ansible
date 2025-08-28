@@ -1,0 +1,25 @@
+# --------------------------------------------------------------------------------------------
+# Dockerfile for Ansible
+# This Dockerfile sets up an environment for running Ansible playbooks
+# It uses Python 3.12 on Alpine Linux for a lightweight image
+# The image includes necessary tools and dependencies for Ansible
+# Usage: docker build -t ansible-image .
+#
+# @author Rohit Akurdekar
+# --------------------------------------------------------------------------------------------
+FROM python:3.12-alpine
+
+RUN apk add --no-cache \
+    bash \
+    make \
+    gcc \
+    g++ \
+    cmake \
+    git \
+    openssh \
+    py3-pip \
+    && pip install ansible
+
+WORKDIR /ansible
+
+
